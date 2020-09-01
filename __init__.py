@@ -3,6 +3,7 @@ from mycroft import MycroftSkill, intent_handler
 from adapt.intent import IntentBuilder
 from mycroft.skills.context import removes_context, adds_context
 from .actions import search
+from lingua_franca.parse import extract_number
 
 
 def is_there_full_match(boolean):
@@ -57,9 +58,10 @@ class Vapm(MycroftSkill):
 
     @intent_handler(IntentBuilder('ReadResults').require('SearchResultsContext').require('read').require('results').optionally('number'))
     def handle_read(self, message):
+        utterance = message.data.get('utterance')
         results = self.latest_results
-        number = message.data.get('number')
-        if number is None:
+        number = extract_number(utterance)
+        if not number:
             number = results.get_number_of_results()
         else:
             number = int(number)
