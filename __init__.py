@@ -8,7 +8,6 @@ class Vapm(MycroftSkill):
 
     @intent_handler('install.intent')
     def handle_install(self, message):
-        package = message.data.get('package')
         pass
 
     @intent_handler('remove.intent')
@@ -16,8 +15,10 @@ class Vapm(MycroftSkill):
         pass
 
     @intent_handler('search.intent')
-    def handle_remove(self, message):
-        pass
+    def handle_search(self, message):
+        package = message.data.get('package')
+        self.speak('I am not ready yet, but hey I can do this, {}!'.format(package))
+        self.get_response()
 
     def converse(self, utterances, lang):
         pass
