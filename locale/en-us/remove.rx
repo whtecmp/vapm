@@ -1,2 +1,2 @@
-(Uninstall)|(Delete)|(Remove) package (?<package>.*)
+(Uninstall)|(Delete)|(Remove) package (?P<package>.*)
 

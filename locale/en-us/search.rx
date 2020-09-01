@@ -1,2 +1,2 @@
-(Find)|(Search) package (?<package>.*)
+(Find)|(Search) package (?P<package>.*)
 

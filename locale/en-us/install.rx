@@ -1,2 +1,2 @@
-(Install)|(Download) package (?<package>.*)
+(Install)|(Download) package (?P<package>.*)
 
