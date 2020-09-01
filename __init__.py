@@ -2,26 +2,32 @@
 from mycroft import MycroftSkill, intent_handler
 from adapt.intent import IntentBuilder
 from mycroft.skills.context import removes_context, adds_context
-#from .actions import search
+from .actions import search
+
+def is_there_full_match(boolean):
+    if boolean:
+        return 'including a full match'
+    return 'without a full match'
+
 
 class Vapm(MycroftSkill):
 
     def __init__(self):
         MycroftSkill.__init__(self)
+        self.latest_results = ''
 
-    #@adds_context('SearchResultsContext')
-    @intent_handler(IntentBuilder('Search').require('search').require('package'))
+    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name'))
+    @adds_context('SearchResultsContext')
     def handle_search(self, message):
-        package = message.data.get('package')
-        #results = search(package)
-        #self.set_context('package_name', package)
-        #self.set_context('result', result)
-        self.speak('I am not ready yet, but hey, I can do this: {}'.format(package))
-        '''self.speak('Got {} results, {}, do you want to filter results?'.format(
+        package_name = message.data.get('package_name')
+        results = search(package_name)
+        self.set_context('package_name', package_name)
+        self.latest_results = results
+        self.speak('Got {} results, {}, do you want to filter results?'.format(
                 results.get_number_of_results(),
-                results.is_there_full_match() ? 'Including a full match' : 'Without a full match'), expect_response=True)'''
+                is_there_full_match(results.is_there_full_match())), expect_response=True)
 
-    '''
+    
     @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter'))
     def handle_filter(self, message):
         pass
@@ -41,7 +47,6 @@ class Vapm(MycroftSkill):
     @intent_handler(IntentBuilder('Remove').require('remove'))
     def handle_remove(self, message):
         pass
-    '''
 
 
 def create_skill():

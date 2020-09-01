@@ -1,2 +1,0 @@
-((Begins with {word}|Ends with {word}|Contains {word}) and )* (Begins with {word}|Ends with {word}|Contains {word})
-
