@@ -1,9 +1,8 @@
 
 from mycroft import MycroftSkill, intent_handler
-#from adapt.intent import IntentBuilder
-#from mycroft.skills.context import removes_context, adds_context
+from adapt.intent import IntentBuilder
+from mycroft.skills.context import removes_context, adds_context
 #from .actions import search
-
 
 class Vapm(MycroftSkill):
 
@@ -11,13 +10,12 @@ class Vapm(MycroftSkill):
         MycroftSkill.__init__(self)
 
     #@adds_context('SearchResultsContext')
-    #@intent_handler(IntentBuilder('Search').require('search'))
+    @intent_handler(IntentBuilder('Search').require('search').require('package'))
     def handle_search(self, message):
-        print ('Ayyyyy!!!')
         package = message.data.get('package')
-        results = search(package)
-        self.set_context('package_name', package)
-        self.set_context('result', result)
+        #results = search(package)
+        #self.set_context('package_name', package)
+        #self.set_context('result', result)
         self.speak('I am not ready yet, but hey, I can do this: {}'.format(package))
         '''self.speak('Got {} results, {}, do you want to filter results?'.format(
                 results.get_number_of_results(),
