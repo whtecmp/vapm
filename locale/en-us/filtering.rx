@@ -1,0 +1,2 @@
+.* (?P<filter_type>(begin|end|contain)(s|)) (with|the word|) (?P<filter_param>.*)
+
