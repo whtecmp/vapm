@@ -1,0 +1,19 @@
+
+1. Better filter communications, for example:
+	* Must contain <filter>
+	* Logical operators such as AND, OR, NOT
+	* Don't have to use 'word' or 'with' in the regex
+	* Apply filter during find i.e. "Find package python only if begins with lib"
+	* Maybe more...
+2. Numeric communication to packages, for example something like this:
+	- User: "find package python"
+	- Mycroft: "Got 3 Results"
+	- U: "Read them"
+	- M: "python, python3.6, libpython"
+	- U: "Dscribe second"
+	- M: "Describing python3.6"
+3. Finish scripts that actually do stuff for APT, and extend to other package managers. 
+4. Think about security, need sudo for installations.
+5. Add tests
+6. Write another TODO.lst
+

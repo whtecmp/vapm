@@ -2,6 +2,8 @@
 Voice assisted package manager
 
 ## About
+This a WIP!! Nothing works!!
+
 Allows mycroft to manage packages on your computer.
 
 you can search, install, remove and manage your packages with voice commands only using vapm.
@@ -11,9 +13,6 @@ vapm is built on top of your existing package manager, be it apt, rpm or even sn
 ## Examples
 * "Search for package python"
 * "Install package gcc"
-
-## Credits
-Me
 
 ## Category
 **Productivity**
