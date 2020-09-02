@@ -1,18 +1,34 @@
 
-def __set(result, packages_names):
-    result.packages_names = packages_names
+from subprocess import Popen, PIPE
+INITIAL_PATH='/opt/mycroft/skills/vapm-skill/scripts/'
+
+class Result(object):
+
+    def __init__(self, packages_names):
+        self.packages_names = packages_names
+
+    def get_number_of_results(self):
+        return len(self.packages_names)
+    
+    def is_there_full_match(self):
+        return package_name in self.packages_names
+
+    def get_packages_names(self):
+        return self.packages_names
+
+    def set_packages_names(self, packages_names):
+        self.packages_names = packages_names
 
 def search(package_name):
-    result = lambda : None
-    result.get_number_of_results = lambda : len(result.packages_names)
-    result.is_there_full_match = lambda : package_name in result.packages_names
-    result.packages_names = ['python', 'python3.6', 'libpython', 'libpython-dev', 'no-quick-yes']
-    result.get_packages_names = lambda : result.packages_names
-    result.set_packages_names = lambda packages_names: __set(result, packages_names)
+    result = Result(['python', 'python3.6', 'libpython', 'libpython-dev', 'no-quick-yes'])
     return result
 
 def get_description(package_name):
-    return 'Describing ' + package_name
+    desc = Popen([INITIAL_PATH+'get_description.sh', package_name], stdout=PIPE)
+    desc = desc.stdout.read().decode()
+    if desc == '':
+        return 'Could not get description of package ' + package_name
+    return desc
 
 def install(package_name):
     return 'Installing ' + package_name
