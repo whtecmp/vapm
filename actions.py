@@ -10,7 +10,7 @@ class Result(object):
     def get_number_of_results(self):
         return len(self.packages_names)
     
-    def is_there_full_match(self):
+    def is_there_full_match(self, package_name):
         return package_name in self.packages_names
 
     def get_packages_names(self):
@@ -20,7 +20,12 @@ class Result(object):
         self.packages_names = packages_names
 
 def search(package_name):
-    result = Result(['python', 'python3.6', 'libpython', 'libpython-dev', 'no-quick-yes'])
+    result = Popen([INITIAL_PATH+'search.sh', package_name], stdout=PIPE)
+    result = result.stdout.read().decode()
+    if result == '':
+        return 'Could not find any package matching ' + package_name
+    result = result.split(' ')
+    result = Result(result)
     return result
 
 def get_description(package_name):

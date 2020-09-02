@@ -37,7 +37,7 @@ class Vapm(MycroftSkill):
         self.latest_results = results
         self.speak('Got {} results, {}'.format(
                 results.get_number_of_results(),
-                _is_there_full_match(results.is_there_full_match())), expect_response=True)
+                _is_there_full_match(results.is_there_full_match(package_name))), expect_response=True)
 
     
     @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
