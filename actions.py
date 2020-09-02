@@ -11,3 +11,12 @@ def search(package_name):
     result.set_packages_names = lambda packages_names: __set(result, packages_names)
     return result
 
+def get_description(package_name):
+    return 'Describing ' + package_name
+
+def install(package_name):
+    return 'Installing ' + package_name
+
+def remove(package_name):
+    return 'Removing ' + package_name
+
