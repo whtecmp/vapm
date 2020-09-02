@@ -11,20 +11,6 @@ def _is_there_full_match(boolean):
         return 'including a full match'
     return 'without a full match'
 
-def _ensure_results_exist(func):
-    def new_func(self, message):
-        package_name = message.data.get('package_name')
-        if self.latest_results != None and package_name in self.latest_results.get_packages_names():
-            func(self, message)
-        elif self.latest_results != None and len(self.latest_results.get_packages_names()) == 1:
-            self.set_context(
-                    'package_name',
-                    self.latest_results.get_packages_names()[0]
-                    )
-            func(self, message)
-        else:
-            self.handle_search(message)
-
 
 class Vapm(MycroftSkill):
 
@@ -35,6 +21,8 @@ class Vapm(MycroftSkill):
     def _ensure_results_exist(self, message):
         package_name = message.data.get('package_name')
         if self.latest_results != None and package_name in self.latest_results.get_packages_names():
+            return True
+        elif self.latest_results != None and self.latest_results.get_number_of_results() == 1:
             return True
         else:
             self.handle_search(message)
@@ -79,20 +67,28 @@ class Vapm(MycroftSkill):
                 new_packages_names.append(package_name)
         self.latest_results.set_packages_names(new_packages_names)
         results = self.latest_results
+        if len(new_packages_names) == 1:
+            self.set_context(
+                    'package_name',
+                    new_packages_names[0]
+                    )
         self.speak('Got {} results'.format(
                 results.get_number_of_results()), expect_response=True)
 
     @intent_handler(IntentBuilder('ReadResults').require('SearchResultsContext').require('read').one_of('results', 'them').optionally('number'))
     def handle_read_results(self, message):
-        utterance = message.data.get('utterance')
-        results = self.latest_results
-        number = extract_number(utterance)
-        if not number:
-            number = results.get_number_of_results()
+        if self.latest_results == None or self.latest_results.get_number_of_results() == 0:
+            self.speak('No package searched for yet.')
         else:
-            number = int(number)
-        for i in range(number):
-            self.speak('{}'.format(results.get_packages_names()[i]))
+            utterance = message.data.get('utterance')
+            results = self.latest_results
+            number = extract_number(utterance)
+            if not number:
+                number = results.get_number_of_results()
+            else:
+                number = int(number)
+            for i in range(number):
+                self.speak('{}'.format(results.get_packages_names()[i]))
 
     @intent_handler(IntentBuilder('ReadDescription').optionally('read').require('description').require('package_name').one_of('package', 'it'))
     def handle_read_description(self, message):
