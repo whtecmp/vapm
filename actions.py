@@ -1,6 +1,6 @@
 
 from subprocess import Popen, PIPE
-INITIAL_PATH='/opt/mycroft/skills/vapm-skill/scripts/'
+INITIAL_PATH='/opt/mycroft/skills/vapm/scripts/'
 
 class Result(object):
 
