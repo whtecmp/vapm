@@ -6,9 +6,9 @@ This a WIP!! Nothing works!!
 
 Allows mycroft to manage packages on your computer.
 
-you can search, install, remove and manage your packages with voice commands only using vapm.
+you can search, install, remove and manage your packages with voice commands using vapm.
 
-vapm is built on top of your existing package manager, be it apt, rpm or even snap, flatpak and appimage.
+vapm is built on top of your existing package manager (i.e. APT).
 
 ## Examples
 * "Search for package python"
