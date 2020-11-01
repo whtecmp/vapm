@@ -1,3 +1,2 @@
 .* (?P<filter_type>(begin|end|contain)(s|)) (with|word) (?P<filter_param>.*)
-.* (?P<filter_type>(begin|end|contain)(s|)) (?P<filter_param>.*)
 
