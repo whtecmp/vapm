@@ -1,6 +1,6 @@
 
 1. Better filter communications, for example:
-	* Must contain <filter>
+	X Must contain <filter>
 	* Logical operators such as AND, OR, NOT
 	* Don't have to use 'word' or 'with' in the regex
 	* Apply filter during find i.e. "Find package python only if begins with lib"
