@@ -28,27 +28,38 @@ class Vapm(MycroftSkill):
             self.handle_search(message)
             return False
 
-    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name'))
+    @classmethod
+    def recognize_an_it(cls, param, name):
+        for word in ['package', 'it', 'name']:
+            if word in param:
+                return name
+        return param
+
+    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name').optionally('filter').optionally('filter_type').optionally('filter_param'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
         package_name = message.data.get('package_name')
         results = search(package_name)
         self.set_context('package_name', package_name)
+        filter_type = message.data.get('filter_type')
+        filter_param = message.data.get('filter_param')
+        self.log.info ('Debug: name: {}, number: {}'.format(package_name, results.get_number_of_results()))
+        if filter_param != None and filter_type != None:
+            filter_param = self.recognize_an_it(filter_param, message.data.get('package_name'))
+            new_packages_names = self.filtering(filter_param, filter_type, results.get_packages_names())
+            results.set_packages_names(new_packages_names)
         self.latest_results = results
+        if results.get_number_of_results() == 1:
+            self.set_context(
+                    'package_name',
+                    results.get_packages_names()[0]
+                    )
         self.speak('Got {} results, {}'.format(
                 results.get_number_of_results(),
                 _is_there_full_match(results.is_there_full_match(package_name))), expect_response=True)
 
-    
-    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
-    def handle_filter(self, message):
-        filter_param = message.data.get('filter_param')
-        filter_type = message.data.get('filter_type')
-        for word in ['package', 'it', 'name']:
-            if word in filter_param:
-                filter_param = message.data.get('package_name')
-                break
-        packages_names = self.latest_results.get_packages_names()
+    @classmethod
+    def filtering(cls, filter_param, filter_type, packages_names):
         begin = lambda name, param: name.startswith(param)
         end = lambda name, param: name.endswith(param)
         contain = lambda name, param: param in name
@@ -65,6 +76,15 @@ class Vapm(MycroftSkill):
         for package_name in packages_names:
             if filter(package_name):
                 new_packages_names.append(package_name)
+        return new_packages_names
+
+    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
+    def handle_filter(self, message):
+        filter_param = message.data.get('filter_param')
+        filter_type = message.data.get('filter_type')
+        filter_param = self.recognize_an_it(filter_param, message.data.get('package_name'))
+        packages_names = self.latest_results.get_packages_names()
+        new_packages_names = self.filtering (filter_param, filter_type, packages_names)
         self.latest_results.set_packages_names(new_packages_names)
         results = self.latest_results
         if len(new_packages_names) == 1:
