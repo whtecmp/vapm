@@ -1,2 +1,2 @@
-.* package (?P<package_name>\S*) 
+.* package (?P<package_name>.*) 
 

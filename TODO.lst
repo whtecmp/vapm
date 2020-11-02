@@ -2,7 +2,7 @@
 1. Better filter communications, for example:
 	X Must contain <filter>
 	* Logical operators such as AND, OR, NOT
-	* Don't have to use 'word' or 'with' in the regex
+	H Don't have to use 'word' or 'with' in the regex
 	X Apply filter during find i.e. "Find package python only if begins with lib"
 2. Numeric communication to packages, for example something like this:
 	- User: "find package python"

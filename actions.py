@@ -21,7 +21,7 @@ class Result(object):
 
 def search(package_name):
     result = Popen([INITIAL_PATH+'search.sh', package_name], stdout=PIPE)
-    result = result.stdout.read().decode()
+    result = result.stdout.read().decode().strip()
     if result == '':
         return 'Could not find any package matching ' + package_name
     result = result.split(' ')
@@ -30,7 +30,7 @@ def search(package_name):
 
 def get_description(package_name):
     desc = Popen([INITIAL_PATH+'get_description.sh', package_name], stdout=PIPE)
-    desc = desc.stdout.read().decode()
+    desc = desc.stdout.read().decode().strip()
     if desc == '':
         return 'Could not get description of package ' + package_name
     return desc
