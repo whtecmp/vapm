@@ -106,7 +106,7 @@ class Vapm(MycroftSkill):
     def _get_number(self, message, default_number=-1):
         utterance = message.data.get('utterance')
         results = self.latest_results
-        number = extract_number(utterance)
+        number = extract_number(utterance, ordinals=True)
         if not number:
             return default_number
         else:
