@@ -1,6 +1,7 @@
 
 from mycroft import MycroftSkill, intent_handler
 from adapt.intent import IntentBuilder
+from adapt.engine import IntentDeterminationEngine
 from mycroft.skills.context import removes_context, adds_context
 from lingua_franca.parse import extract_number
 
@@ -49,12 +50,21 @@ class Vapm(MycroftSkill):
             self.speak(results)
         else:
             self.set_context('package_name', package_name)
-            filter_type = message.data.get('filter_type')
-            filter_param = message.data.get('filter_param')
-            self.log.info ('Search- name: {}, number: {}'.format(package_name, results.get_number_of_results()))
-            if filter_param != None and filter_type != None:
-                filter_param = self._recognize_an_it(filter_param, message.data.get('package_name'))
-                new_packages_names = self.filtering(filter_param, filter_type, results.get_packages_names())
+            with open('/opt/mycroft/skills/vapm/locale/en-us/filtering.rx', 'r') as regex_file:
+                regex = regex_file.read()
+            engine = IntentDeterminationEngine()
+            engine.register_regex_entity(regex)
+            filter_intent = IntentBuilder('FilteringSearch').require('filter_type').require('filter_param').build()
+            engine.register_intent_parser(filter_intent)
+            utterance = message.data.get('utterance')
+            index = utterance.find(package_name) + len(package_name)
+            utterance = utterance[index:]
+            self.log.info('Searching for: {}'.format(utterance))
+            intent = None
+            for intent in engine.determine_intent(utterance):
+                break
+            if intent != None and intent.get('confidence') > 0:
+                new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
                 results.set_packages_names(new_packages_names)
             self.latest_results = results
             if results.get_number_of_results() == 1:
@@ -65,6 +75,52 @@ class Vapm(MycroftSkill):
             self.speak('Got {} results, {}'.format(
                     results.get_number_of_results(),
                     _is_there_full_match(results.is_there_full_match(package_name))), expect_response=True)
+
+    @classmethod
+    def utterance_filtering(cls, utterance, packages_names, context_package_name, log=lambda __: None):
+        with open('/opt/mycroft/skills/vapm/locale/en-us/filtering.rx', 'r') as regex_file:
+            regex = regex_file.read().strip()
+        engine = IntentDeterminationEngine()
+        engine.register_regex_entity(regex)
+        filter_intent = IntentBuilder('FilteringSearch').require('filter_type').require('filter_param').build()
+        engine.register_intent_parser(filter_intent)
+        words = utterance.split(' ')
+        sentences = []
+        sentence = ''
+        yesno = 1
+        for word in words:
+            if word not in ['and', 'or', 'not']:
+                sentence += (word + ' ')
+            elif word != 'not':
+                sentences.append((yesno, sentence))
+                sentence = ''
+                sentences.append((0, word))
+                yesno = 1
+            else:
+                yesno = -1
+        sentences.append((yesno, sentence))
+        
+        latest_operand = 'or'
+        all_packages_names = packages_names
+        current_packages_names = []
+        for yesno, sentence in sentences:
+            if sentence not in ['and', 'or']:
+                log (sentence)
+                for intent in engine.determine_intent(sentence):
+                    break
+                filter_param = intent.get('filter_param')
+                filter_type = intent.get('filter_type')
+                filter_param = cls._recognize_an_it(filter_param, context_package_name)
+                new_packages_names = cls.filtering (filter_param, filter_type, all_packages_names)
+                if yesno == -1:
+                    new_packages_names = [package_name for package_name in all_packages_names if package_name not in new_packages_names]
+                if latest_operand == 'or':
+                    current_packages_names = [package_name for package_name in all_packages_names if package_name in current_packages_names or package_name in new_packages_names]
+                elif latest_operand == 'and':
+                    current_packages_names = [package_name for package_name in all_packages_names if package_name in current_packages_names and package_name in new_packages_names]
+            else:
+                latest_operand = sentence
+        return current_packages_names
 
     @classmethod
     def filtering(cls, filter_param, filter_type, packages_names):
@@ -88,20 +144,16 @@ class Vapm(MycroftSkill):
 
     @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
     def handle_filter(self, message):
-        filter_param = message.data.get('filter_param')
-        filter_type = message.data.get('filter_type')
-        filter_param = self._recognize_an_it(filter_param, message.data.get('package_name'))
-        packages_names = self.latest_results.get_packages_names()
-        new_packages_names = self.filtering (filter_param, filter_type, packages_names)
+        utterance = message.data.get('utterance')
+        new_packages_names = self.utterance_filtering(utterance, self.latest_results.get_packages_names(), message.data.get('package_name'), self.log.debug)
         self.latest_results.set_packages_names(new_packages_names)
-        results = self.latest_results
         if len(new_packages_names) == 1:
             self.set_context(
                     'package_name',
                     new_packages_names[0]
                     )
         self.speak('Got {} results'.format(
-                results.get_number_of_results()), expect_response=True)
+                self.latest_results.get_number_of_results()), expect_response=True)
 
     def _get_number(self, message, default_number=-1):
         utterance = message.data.get('utterance')
@@ -124,7 +176,7 @@ class Vapm(MycroftSkill):
     @intent_handler(IntentBuilder('ReadDescription').optionally('read').require('description').require('package_name').one_of('package', 'it'))
     def handle_read_description(self, message):
         number = self._get_number(message)
-        self.log.info ('Describe- number: {}'.format(number))
+        self.log.debug ('Describe- number: {}'.format(number))
         if number == -1:
             if self._ensure_results_exist(message):
                 package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
