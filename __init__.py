@@ -41,14 +41,14 @@ class Vapm(MycroftSkill):
                 return name
         return param
 
-    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name_and_more').require('filter_utterance').optionally('filter').optionally('filter_type').optionally('filter_param'))
+    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name_and_more').optionally('filter').optionally('filter_type').optionally('filter_param'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
         with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
             vocabulary = vocabulary_file.readlines()
         vocabulary = [voc.strip() for voc in vocabulary]
         package_name = message.data.get('package_name_and_more')
-        self.log.info ('utterance is {}, package_name is {}, filter_utterance is {}'.format(message.data.get('utterance'), message.data.get('package_name'), message.data.get('filter_utterance')))
+        self.log.info ('utterance is {}\n package_name is {}\n filter_utterance is {}'.format(message.data.get('utterance'), package_name, message.data.get('filter_utterance')))
         words = package_name.split(' ')
         package_name = ''
         i = 0
@@ -69,20 +69,8 @@ class Vapm(MycroftSkill):
             self.set_context('package_name', package_name)
             self.log.info ('utterance is {}'.format(utterance))
             if utterance != '':
-                with open('/opt/mycroft/skills/vapm/locale/en-us/filtering.rx', 'r') as regex_file:
-                    regex = regex_file.read()
-                engine = IntentDeterminationEngine()
-                engine.register_regex_entity(regex)
-                filter_intent = IntentBuilder('FilteringSearch').require('filter_type').require('filter_param').build()
-                engine.register_intent_parser(filter_intent)
-                self.log.info('Searching for: {}'.format(utterance))
-                intent = None
-                for intent in engine.determine_intent(utterance):
-                    break
-                import json; self.log.info ('intent is {}'.format(json.dumps(intent)))
-                if intent != None and intent.get('confidence') > 0:
-                    new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
-                    results.set_packages_names(new_packages_names)
+                new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
+                results.set_packages_names(new_packages_names)
             self.latest_results = results
             if results.get_number_of_results() == 1:
                 self.set_context(
