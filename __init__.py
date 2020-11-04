@@ -41,15 +41,15 @@ class Vapm(MycroftSkill):
                 return name
         return param
 
-    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_details').optionally('filter').optionally('filter_type').optionally('filter_param'))
+    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_details'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
         with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
             vocabulary = vocabulary_file.readlines()
         vocabulary = [voc.strip() for voc in vocabulary]
-        package_name = message.data.get('package_details')
-        self.log.info ('utterance is {}\n package_name is {}'.format(message.data.get('utterance'), package_name))
-        words = package_name.split(' ')
+        package_details = message.data.get('package_details')
+        words = package_details.split(' ')
+        self.log.info('package_details is {}\n words are {}'.format(package_details, words))
         package_name = ''
         i = 0
         for word in words:
@@ -59,7 +59,6 @@ class Vapm(MycroftSkill):
             else:
                 break
         package_name = package_name.strip()
-        self.log.info (words)
         utterance = ' '.join(words[i:])
         package_name = self._multiword_package_name_procesor(package_name)
         results = search(package_name)
@@ -67,7 +66,6 @@ class Vapm(MycroftSkill):
             self.speak(results)
         else:
             self.set_context('package_name', package_name)
-            self.log.info ('utterance is {}'.format(utterance))
             if utterance != '':
                 new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
                 results.set_packages_names(new_packages_names)
