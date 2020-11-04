@@ -1,2 +1,2 @@
-.* package (?P<package_name>.*)
+.* package (?P<package_name>.*)|((?P<package_name>.*) (only|must|filter).*)
 
