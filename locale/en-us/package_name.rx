@@ -1,2 +1,2 @@
-.* package (?P<package_name>.*)|((?P<package_name>.*) (?P<filter_utterance>only|must|filter).*)
+.* package (?P<package_name_and_more>.*)
 

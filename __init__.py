@@ -41,13 +41,14 @@ class Vapm(MycroftSkill):
                 return name
         return param
 
-    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name').optionally('filter').optionally('filter_type').optionally('filter_param'))
+    @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name_and_more').require('filter_utterance').optionally('filter').optionally('filter_type').optionally('filter_param'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
         with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
             vocabulary = vocabulary_file.readlines()
         vocabulary = [voc.strip() for voc in vocabulary]
-        package_name = message.data.get('package_name')
+        package_name = message.data.get('package_name_and_more')
+        self.log.info ('utterance is {}, package_name is {}, filter_utterance is {}'.format(message.data.get('utterance'), message.data.get('package_name'), message.data.get('filter_utterance')))
         words = package_name.split(' ')
         package_name = ''
         i = 0
