@@ -44,28 +44,45 @@ class Vapm(MycroftSkill):
     @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_name').optionally('filter').optionally('filter_type').optionally('filter_param'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
-        package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
+        self.log.info(message.data.get('utterance'))
+        with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
+            vocabulary = vocabulary_file.readlines()
+        vocabulary = [voc.strip() for voc in vocabulary]
+        package_name = message.data.get('package_name')
+        self.log.info('orig package name is {}'.format(package_name))
+        words = package_name.split(' ')
+        package_name = ''
+        i = 0
+        for word in words:
+            if word not in vocabulary:
+                package_name += (word + ' ')
+                i+=1
+            else:
+                break
+        package_name = package_name.strip()
+        self.log.info (words)
+        utterance = ' '.join(words[i:])
+        self.log.info('filtering on: {}, i: {}, package_name: {}\n vocabulary: {}\n words: {}'.format(utterance, i, package_name, vocabulary, words))
+        package_name = self._multiword_package_name_procesor(package_name)
         results = search(package_name)
         if isinstance(results, str):
             self.speak(results)
         else:
             self.set_context('package_name', package_name)
-            with open('/opt/mycroft/skills/vapm/locale/en-us/filtering.rx', 'r') as regex_file:
-                regex = regex_file.read()
-            engine = IntentDeterminationEngine()
-            engine.register_regex_entity(regex)
-            filter_intent = IntentBuilder('FilteringSearch').require('filter_type').require('filter_param').build()
-            engine.register_intent_parser(filter_intent)
-            utterance = message.data.get('utterance')
-            index = utterance.find(package_name) + len(package_name)
-            utterance = utterance[index:]
-            self.log.info('Searching for: {}'.format(utterance))
-            intent = None
-            for intent in engine.determine_intent(utterance):
-                break
-            if intent != None and intent.get('confidence') > 0:
-                new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
-                results.set_packages_names(new_packages_names)
+            if utterance != '':
+                with open('/opt/mycroft/skills/vapm/locale/en-us/filtering.rx', 'r') as regex_file:
+                    regex = regex_file.read()
+                engine = IntentDeterminationEngine()
+                engine.register_regex_entity(regex)
+                filter_intent = IntentBuilder('FilteringSearch').require('filter_type').require('filter_param').build()
+                engine.register_intent_parser(filter_intent)
+                self.log.info('Searching for: {}'.format(utterance))
+                intent = None
+                for intent in engine.determine_intent(utterance):
+                    break
+                if intent != None and intent.get('confidence') > 0:
+                    new_packages_names = self.utterance_filtering(utterance, results.get_packages_names(), package_name, self.log.info)
+                    results.set_packages_names(new_packages_names)
             self.latest_results = results
             if results.get_number_of_results() == 1:
                 self.set_context(
