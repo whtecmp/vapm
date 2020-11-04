@@ -48,7 +48,7 @@ class Vapm(MycroftSkill):
             vocabulary = vocabulary_file.readlines()
         vocabulary = [voc.strip() for voc in vocabulary]
         package_name = message.data.get('package_details')
-        self.log.info ('utterance is {}\n package_name is {}\n filter_utterance is {}'.format(message.data.get('utterance'), package_name, message.data.get('filter_utterance')))
+        self.log.info ('utterance is {}\n package_name is {}'.format(message.data.get('utterance'), package_name))
         words = package_name.split(' ')
         package_name = ''
         i = 0
@@ -147,7 +147,7 @@ class Vapm(MycroftSkill):
                 new_packages_names.append(package_name)
         return new_packages_names
 
-    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
+    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name').require('not_package'))
     def handle_filter(self, message):
         utterance = message.data.get('utterance')
         new_packages_names = self.utterance_filtering(utterance, self.latest_results.get_packages_names(), message.data.get('package_name'), self.log.debug)
