@@ -1,11 +1,22 @@
 
-from mycroft import MycroftSkill, intent_handler
+from mycroft import MycroftSkill
+from mycroft import intent_handler as intent_handler
 from adapt.intent import IntentBuilder
 from adapt.engine import IntentDeterminationEngine
 from mycroft.skills.context import removes_context, adds_context
 from lingua_franca.parse import extract_number
 
 from .actions import search, get_description, install, remove
+
+# def intent_handler(*args, **kwargs):
+#     func = intent_handler_orig(*args, **kwargs)
+#     def new_func(*args, **kwargs):
+#         func2 = func(*args, **kwargs)
+#         def inner_func(*args, **kwargs):
+#             from remote_pdb import RemotePdb; RemotePdb('127.0.0.1', 6060).set_trace()
+#             return func2(*args, **kwargs)
+#         return inner_func
+#     return new_func
 
 def _is_there_full_match(boolean):
     if boolean:
@@ -18,6 +29,7 @@ class Vapm(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         self.latest_results = None
+        self.debugging_list = []
 
     def _ensure_results_exist(self, message):
         package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
@@ -44,12 +56,13 @@ class Vapm(MycroftSkill):
     @intent_handler(IntentBuilder('Search').require('search').require('package').require('package_details'))
     @adds_context('SearchResultsContext')
     def handle_search(self, message):
-        with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
-            vocabulary = vocabulary_file.readlines()
-        vocabulary = [voc.strip() for voc in vocabulary]
+        #from remote_pdb import RemotePdb; RemotePdb('127.0.0.1', 6060).set_trace()
         package_details = message.data.get('package_details')
         words = package_details.split(' ')
         self.log.info('package_details is {}\n words are {}\n utterance is {}'.format(package_details, words, message.data.get('utterance')))
+        with open('/opt/mycroft/skills/vapm/locale/en-us/filter.voc', 'r') as vocabulary_file:
+            vocabulary = vocabulary_file.readlines()
+        vocabulary = [voc.strip() for voc in vocabulary]
         package_name = ''
         i = 0
         for word in words:
