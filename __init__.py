@@ -49,7 +49,7 @@ class Vapm(MycroftSkill):
         vocabulary = [voc.strip() for voc in vocabulary]
         package_details = message.data.get('package_details')
         words = package_details.split(' ')
-        self.log.info('package_details is {}\n words are {}'.format(package_details, words))
+        self.log.info('package_details is {}\n words are {}\n utterance is {}'.format(package_details, words, message.data.get('utterance')))
         package_name = ''
         i = 0
         for word in words:
@@ -106,6 +106,7 @@ class Vapm(MycroftSkill):
         latest_operand = 'or'
         all_packages_names = packages_names
         current_packages_names = []
+        log (sentences)
         for yesno, sentence in sentences:
             if sentence not in ['and', 'or']:
                 log (sentence)
@@ -145,10 +146,10 @@ class Vapm(MycroftSkill):
                 new_packages_names.append(package_name)
         return new_packages_names
 
-    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name').require('not_package'))
+    @intent_handler(IntentBuilder('FilteringSearch').require('SearchResultsContext').require('filter').require('filter_type').require('filter_param').require('package_name'))
     def handle_filter(self, message):
         utterance = message.data.get('utterance')
-        new_packages_names = self.utterance_filtering(utterance, self.latest_results.get_packages_names(), message.data.get('package_name'), self.log.debug)
+        new_packages_names = self.utterance_filtering(utterance, self.latest_results.get_packages_names(), message.data.get('package_name'), self.log.info)
         self.latest_results.set_packages_names(new_packages_names)
         if len(new_packages_names) == 1:
             self.set_context(
