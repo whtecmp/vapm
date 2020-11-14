@@ -1,5 +1,6 @@
 
 from subprocess import Popen, PIPE
+from os import system
 INITIAL_PATH='/opt/mycroft/skills/vapm/scripts/'
 
 class Result(object):
@@ -36,7 +37,8 @@ def get_description(package_name):
     return desc
 
 def install(package_name):
-    return 'Installing ' + package_name
+    system('sudo {path}/install.sh {package_name} &'.format(path=INITIAL_PATH, package_name=package_name))
+    return 'Initiated installation of ' + package_name + '...'
 
 def remove(package_name):
     return 'Removing ' + package_name

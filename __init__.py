@@ -172,9 +172,9 @@ class Vapm(MycroftSkill):
         self.speak('Got {} results'.format(
                 self.latest_results.get_number_of_results()), expect_response=True)
 
-    def _get_number(self, message, default_number=-1):
+    @classmethod
+    def _get_number(cls, message, default_number=-1):
         utterance = message.data.get('utterance')
-        results = self.latest_results
         number = extract_number(utterance, ordinals=True)
         if not number:
             return default_number
@@ -190,35 +190,30 @@ class Vapm(MycroftSkill):
             for i in range(number):
                 self.speak('{}'.format(self.latest_results.get_packages_names()[i]))
 
-    @intent_handler(IntentBuilder('ReadDescription').optionally('read').require('description').require('package_name').one_of('package', 'it'))
-    def handle_read_description(self, message):
+    def _handle_operation_on_package(self, message, operation):
         number = self._get_number(message)
-        self.log.debug ('Describe- number: {}'.format(number))
+        self.log.debug ('{}- number: {}'.format(operation, number))
         if number == -1:
             if self._ensure_results_exist(message):
                 package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
-                self.speak(get_description(package_name))
+                self.speak(operation(package_name))
             else:
                 pass
         else:
             package_name = self.latest_results.get_packages_names()[number - 1]
-            self.speak(get_description(package_name))
+            self.speak(operation(package_name))
+
+    @intent_handler(IntentBuilder('ReadDescription').optionally('read').require('description').require('package_name').one_of('package', 'it'))
+    def handle_read_description(self, message):
+        self._handle_operation_on_package(message, get_description)
 
     @intent_handler(IntentBuilder('Install').require('install').require('package_name').one_of('package', 'it'))
-    def handle_install(self, message): 
-        if self._ensure_results_exist(message):
-            package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
-            self.speak(install(package_name))
-        else:
-            pass
+    def handle_install(self, message):
+        self._handle_operation_on_package(message, install)
 
     @intent_handler(IntentBuilder('Remove').require('remove').require('package_name').one_of('package', 'it'))
     def handle_remove(self, message):
-        if self._ensure_results_exist(message):
-            package_name = self._multiword_package_name_procesor(message.data.get('package_name'))
-            self.speak(remove(package_name))
-        else:
-            pass
+        self._handle_operation_on_package(message, remove)
 
 
 def create_skill():

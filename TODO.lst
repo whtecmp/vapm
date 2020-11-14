@@ -1,5 +1,5 @@
 
-1. Better filter communications, for example:
+X. Better filter communications, for example:
 	X Must contain <filter>
 	X Logical operators such as AND, OR, NOT
 	H Don't have to use 'word' or 'with' in the regex

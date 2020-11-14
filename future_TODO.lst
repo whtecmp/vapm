@@ -1,4 +1,6 @@
 
 1. Add error handaling.
 2. Add pako support.
+3. Pathes of things should be configurable.
+	* Includes issues with manual useage of Adapt, because of language issues.
 
