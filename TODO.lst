@@ -3,7 +3,7 @@
 	X Must contain <filter>
 	X Logical operators such as AND, OR, NOT
 	H Don't have to use 'word' or 'with' in the regex
-	* Apply filter during find i.e. "Find package python only if begins with lib"
+	H Apply filter during find i.e. "Find package python only if begins with lib"
 X. Numeric communication to packages, for example something like this:
 	- User: "find package python"
 	- Mycroft: "Got 3 Results"
