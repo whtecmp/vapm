@@ -41,5 +41,6 @@ def install(package_name):
     return 'Initiated installation of ' + package_name + '...'
 
 def remove(package_name):
-    return 'Removing ' + package_name
+    system('sudo {path}/remove.sh {package_name} &'.format(path=INITIAL_PATH, package_name=package_name))
+    return 'Initiated removal of ' + package_name + '...'
 

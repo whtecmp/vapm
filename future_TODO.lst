@@ -1,6 +1,7 @@
 
-1. Add error handaling.
-2. Add pako support.
-3. Pathes of things should be configurable.
+1. Mycroft bug of utterance 'install package python only if contains python', not reading last 'python' on second try.
+2. Add error handaling.
+3. Add pako support.
+4. Pathes of things should be configurable.
 	* Includes issues with manual useage of Adapt, because of language issues.
 
