@@ -12,7 +12,7 @@ X. Numeric communication to packages, for example something like this:
 	- U: "Dscribe second"
 	- M: "Describing python3.6"
 X. Finish scripts that actually do stuff for APT, and extend to other package managers.
-4. Think about security, need sudo for installations.
+X. Think about security, need sudo for installations.
 5. Add tests
 6. Write another TODO.lst
 
