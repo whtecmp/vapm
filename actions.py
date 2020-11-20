@@ -1,7 +1,7 @@
 
 from subprocess import Popen, PIPE
 from os import system
-INITIAL_PATH='/opt/mycroft/skills/vapm/scripts/'
+INITIAL_PATH='/opt/mycroft-root/vapm/scripts/'
 
 class Result(object):
 
