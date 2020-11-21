@@ -2,7 +2,6 @@
 Voice assisted package manager
 
 ## About
-This a WIP!! Nothing works!!
 
 Allows mycroft to manage packages on your computer.
 
