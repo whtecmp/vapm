@@ -5,8 +5,8 @@ apt -y remove $package_name
 err_code=$?
 
 if [ "$err_code" == 0 ]; then
-	sudo -u user python3 /opt/mycroft-root/vapm/scripts/send_to_mycroft.py "Package $package_name removed successfully."
+	sudo -u mycroft python3 /opt/mycroft-root/vapm/scripts/send_to_mycroft.py "Package $package_name removed successfully."
 elif [ "$err_code" == 100 ]; then
-	sudo -u user python3 /opt/mycroft-root/vapm/scripts/send_to_mycroft.py "Package $package_name failed removal."
+	sudo -u mycroft python3 /opt/mycroft-root/vapm/scripts/send_to_mycroft.py "Package $package_name failed removal."
 fi
 
